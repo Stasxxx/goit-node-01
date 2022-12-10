@@ -9,37 +9,47 @@ const listContacts = async () => {
   const result = await fs.readFile(contactsPath);
   
   return JSON.parse(result);
-}
+};
 
 const getContactById = async (contactId) => {
+  const idContact = String(contactId)
   const contacts = await listContacts();
-  const result = contacts.find(item => item.id === contactId)
+  const result = contacts.find(item => item.id === idContact);
 
   return result || null;
-}
+};
 
 const removeContact = async (contactId) => {
-  // ...твій код
-}
+  const idContact = String(contactId)
+  const contacts = await listContacts();
+  const index = contacts.findIndex(item => item.id === idContact);
 
-const addContact = async ({name, email, phone}) => {
+  if (index === -1) {
+    return null;
+  }
+
+  const [result] = contacts.splice(index, 1);
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  return result;
+};
+
+const addContact = async ({ name, email, phone }) => {
   const contacts = await listContacts();
   const newContact = {
-    contactId: nanoid(),
+    id: nanoid(),
     name,
     email,
     phone,
   }
-  contacts.push(newContact)
+  contacts.push(newContact);
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
   
   return newContact;
-}
-
+};
 
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
-}
+};
